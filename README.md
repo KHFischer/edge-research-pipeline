@@ -35,7 +35,7 @@ If you're interested in:
 - Collaborating on use cases in finance, research, or education
 - Early access to advanced features (e.g., automation, dashboard exports, academic support)
 
-👉 [Open an issue](https://github.com/yourusername/edge-research-pipeline/issues) or [start a discussion](https://github.com/yourusername/edge-research-pipeline/discussions)
+👉 [Open an issue](https://github.com/khfischer/edge-research-pipeline/issues) or [start a discussion](https://github.com/khfischer/edge-research-pipeline/discussions)
 
 ---
 
