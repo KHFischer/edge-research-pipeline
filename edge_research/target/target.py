@@ -1,11 +1,6 @@
-from __future__ import annotations
-from typing import List, Optional, Dict, Any, Tuple
 import pandas as pd
 import numpy as np
 import warnings
-
-import pandas as pd
-import numpy as np
 from typing import List, Optional, Literal, Tuple, Dict, Any
 
 def compute_forward_return(
@@ -459,61 +454,3 @@ def bin_target_column(
     log_df = pd.concat(log_entries, ignore_index=True)
 
     return df_new, log_df
-
-def target_returns_main(
-    df: pd.DataFrame,
-    hloc_data: pd.DataFrame,
-    logger: MarkdownLogger,
-    id_cols: list[str] = ['ticker'], 
-    date_col: str = 'date',
-    price_col: str = 'adj_close',
-    lookforward_dt_units: float = 60,
-    target_binning_method: str = "custom",
-    target_bins: list[float] = [-np.inf, -0.05, 0.05, np.inf],
-    target_labels: list[str] = ["down", "sideways", "up"],
-    target_grouping: str = "none",
-    target_dt_units: int = 60
-) -> pd.DataFrame:
-    
-    # Compute returns after N dt units
-    returns = compute_returns(hloc_data, lookforward_dt_units, id_cols, date_col, price_column=price_col)
-    
-    # Forward merge returns with features df
-    ## + Custom logging functions 
-    df = merge_features_with_returns(
-        feature_df=df, 
-        returns_df=returns, 
-        id_cols=id_cols, 
-        feature_date_col=date_col, 
-        returns_date_col=date_col
-    )
-    log_params, log_df = summarize_merge(df, id_cols, date_col, date_col)
-    logger.log_step(step_name="Returns merge log", info={
-        "lookforward_dt_units": lookforward_dt_units,
-        "id_cols": id_cols,
-        "date_col": date_col,
-    }, df=log_df)
-    
-    # Drop NaN -- target can't be empty
-    df.dropna(subset='return', inplace=True)
-    
-    # Bin target column based on chosen method
-    df, target_bin_log = bin_target_column(
-        df=df,
-        binning_method=target_binning_method,
-        bins=target_bins,
-        labels=target_labels,
-        id_cols=id_cols,
-        date_col=date_col,
-        grouping=target_grouping,
-        n_datetime_units=target_dt_units,
-    )
-    logger.log_step(step_name="Target binning log", info={
-        "target_binning_method": target_binning_method,
-        "target_bins": target_bins,
-        "id_cols": id_cols,
-        "date_col": date_col,
-        "target_grouping": target_grouping,
-        "target_dt_units": target_dt_units,
-    }, df=target_bin_log)
-    return df
