@@ -15,7 +15,8 @@ from edge_research.mining import (
     normalize_rule,
     deduplicate_rules_with_provenance,
     count_rules_per_algorithm,
-    generate_rule_activation_dataframe
+    generate_rule_activation_dataframe,
+    mine_stats
 )
 
 # Test for prepare_dataframe_for_mining()
@@ -638,3 +639,146 @@ def test_generate_rule_activation_dataframe_rule_column_naming_consistency():
 
     assert 'custom_rule_0000' in rule_df.columns
     assert mapping_df['rule_column'].iloc[0] == 'custom_rule_0000'
+
+# Test for mine_stats()
+# Dummy mining functions to patch
+@pytest.fixture(autouse=True)
+def patch_miner_dependencies(monkeypatch):
+    dummy_stats = pd.DataFrame([{"antecedents": "('feat1', 1)", "rule_depth": 1}])
+    dummy_log = pd.DataFrame([{"info": "log"}])
+    dummy_rules = [[("feat1", 1), ("feat2", 0)]]
+
+    monkeypatch.setattr("edge_research.mining.mine_univar", lambda df, cfg: (dummy_stats, dummy_log))
+    monkeypatch.setattr("edge_research.mining.mine_apriori", lambda *args, **kwargs: (dummy_rules, dummy_log))
+    monkeypatch.setattr("edge_research.mining.mine_rulefit", lambda *args, **kwargs: (dummy_rules, dummy_log))
+    monkeypatch.setattr("edge_research.mining.mine_subgroup", lambda *args, **kwargs: (dummy_rules, dummy_log))
+    monkeypatch.setattr("edge_research.mining.mine_elcs", lambda *args, **kwargs: (dummy_rules, dummy_log))
+    monkeypatch.setattr("edge_research.mining.mine_cn2", lambda *args, **kwargs: (dummy_rules, dummy_log))
+    monkeypatch.setattr("edge_research.mining.mine_cart", lambda *args, **kwargs: (dummy_rules, dummy_log))
+    monkeypatch.setattr(
+        "edge_research.mining.mine_multivar",
+        lambda df, sources, target_col: (
+            pd.DataFrame([{"antecedents": "('featA', 1) AND ('featB', 0)", "rule_depth": 2}]),
+            dummy_log,
+            pd.DataFrame([{"algorithm": "apriori", "unique_rule_count": 1}])
+        )
+    )
+
+
+@pytest.fixture
+def sample_df():
+    return pd.DataFrame({
+        "feat1": [1, 0, 1, 0],
+        "feat2": [0, 1, 1, 0],
+        "forward_return": [1, 0, 1, 0]
+    })
+
+
+@pytest.mark.parametrize("miners", [
+    ["univar"],
+    ["rulefit"],
+    ["apriori"],
+    ["univar", "apriori", "rulefit"],
+])
+def test_mine_stats_valid_outputs(sample_df, miners):
+    cfg = {"dummy_config": True}
+    stats_df, logs, rules_df = mine_stats(df=sample_df, target_col="forward_return", miners=miners, cfg=cfg)
+
+    # Output must be dataframes
+    assert isinstance(stats_df, pd.DataFrame)
+    assert isinstance(rules_df, pd.DataFrame)
+    assert isinstance(logs, dict)
+
+    # Logs must contain keys for each miner used
+    for m in miners:
+        assert m in logs or m == "univar"
+    if "univar" in miners:
+        assert "multivar" in logs  # triggered by combined rule_sources
+
+
+def test_mine_stats_unknown_miner_raises(sample_df):
+    cfg = {}
+    with pytest.raises(ValueError, match="Unrecognized miners"):
+        mine_stats(df=sample_df, target_col="forward_return", miners=["badminer"], cfg=cfg)
+
+
+def test_mine_stats_empty_miners_returns_empty_stats(sample_df):
+    cfg = {}
+    stats_df, logs, rules_df = mine_stats(df=sample_df, target_col="forward_return", miners=[], cfg=cfg)
+    assert stats_df.empty
+    assert rules_df.empty
+    assert logs == {}
+
+
+def test_mine_stats_only_univar_produces_rules_row(sample_df):
+    cfg = {"dummy": True}
+    stats_df, logs, rules_df = mine_stats(df=sample_df, target_col="forward_return", miners=["univar"], cfg=cfg)
+    assert "univar" in logs
+    assert "algorithm" in rules_df.columns
+    assert (rules_df["algorithm"] == "univar").any()
+
+# Test for coalesce_data()
+@pytest.fixture
+def real_df():
+    return pd.DataFrame({"id": [1, 2], "val": ["a", "b"]})
+
+
+@pytest.fixture
+def synth_df():
+    return pd.DataFrame({"id": [3, 4], "val": ["c", "d"]})
+
+
+@pytest.fixture
+def augmented_real_df():
+    return pd.DataFrame({"id": [1, 2], "val": ["a*", "b*"]})
+
+
+@pytest.fixture
+def augmented_synth_df():
+    return pd.DataFrame({"id": [3, 4], "val": ["c*", "d*"]})
+
+
+def test_real_only(real_df):
+    result = coalesce_data(real_df, None, None, None)
+    pd.testing.assert_frame_equal(result.reset_index(drop=True), real_df.reset_index(drop=True))
+
+
+def test_real_plus_synth(real_df, synth_df):
+    result = coalesce_data(real_df, synth_df, None, None)
+    expected = pd.concat([real_df, synth_df], ignore_index=True)
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_augmented_real_only(real_df, augmented_real_df):
+    result = coalesce_data(real_df, None, augmented_real_df, None)
+    pd.testing.assert_frame_equal(result, augmented_real_df)
+
+
+def test_augmented_synth_only(real_df, synth_df, augmented_synth_df):
+    result = coalesce_data(real_df, synth_df, None, augmented_synth_df)
+    expected = pd.concat([real_df, augmented_synth_df], ignore_index=True)
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_augmented_real_and_augmented_synth(real_df, augmented_real_df, synth_df, augmented_synth_df):
+    result = coalesce_data(real_df, synth_df, augmented_real_df, augmented_synth_df)
+    expected = pd.concat([augmented_real_df, augmented_synth_df], ignore_index=True)
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_augmented_real_and_unaugmented_synth(real_df, augmented_real_df, synth_df):
+    result = coalesce_data(real_df, synth_df, augmented_real_df, None)
+    expected = pd.concat([augmented_real_df, synth_df], ignore_index=True)
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_edge_case_empty_real_but_augment_still_works():
+    df = pd.DataFrame()
+    result = coalesce_data(df, None, None, None)
+    pd.testing.assert_frame_equal(result, df)
+
+
+def test_inconsistent_columns_raises(real_df, synth_df):
+    synth_df = synth_df.rename(columns={"val": "different_col"})
+    with pytest.raises(ValueError):
+        coalesce_data(real_df, synth_df, None, None)

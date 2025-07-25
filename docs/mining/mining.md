@@ -488,3 +488,76 @@
   - Missing feature or target columns triggering exceptions.
   - Edge case of no rules (empty input).
   - Custom rule column naming.
+
+## 🧠 Function: `mine_stats`
+
+### 📄 What It Does
+- Runs one or more rule mining algorithms on a given dataframe and returns combined rule statistics, per-miner logs, and rule provenance.
+- Supports both univariate statistics and multivariate rule mining across several configurable algorithms.
+
+### 🚦 When to Use
+- Use this function when you want to apply multiple rule mining techniques in a unified pipeline and compare their outputs.
+- Ideal for batch mining workflows, dashboard generation, and edge discovery pipelines.
+- **Avoid if** you only want to run a single miner with custom handling — use the individual `mine_*` functions instead.
+
+### 🔢 Inputs and Outputs
+
+#### Inputs
+- `df: pd.DataFrame`  
+  Cleaned and preprocessed dataset to mine.
+- `target_col: str`  
+  Name of the target variable column.
+- `miners: List[str]`  
+  List of miners to execute. Supported: `'univar'`, `'apriori'`, `'rulefit'`, `'subgroup'`, `'elcs'`, `'cn2'`, `'cart'`.
+- `cfg: Any`  
+  Configuration object passed to the univariate stat function and stat calculator.
+- `apriori_min_support: float`  
+  Minimum support for Apriori mining.
+- `apriori_metric: str`  
+  Rule quality metric for Apriori (e.g., `'lift'`, `'confidence'`).
+- `apriori_min_metric: float`  
+  Minimum threshold for Apriori metric.
+- `rulefit_tree_size: int`  
+  Tree depth for RuleFit.
+- `rulefit_min_depth: int`  
+  Minimum rule length to retain from RuleFit.
+- `subgroup_top_n: int`  
+  Max number of subgroup rules per class.
+- `subgroup_depth: int`  
+  Maximum rule depth for subgroup mining.
+- `subgroup_beam_width: int`  
+  Beam width for subgroup search.
+
+
+#### Outputs
+- `final_stats_df: pd.DataFrame`  
+  Combined statistics for all mined rules, with metrics and provenance.
+- `logs: Dict[str, pd.DataFrame]`  
+  Dictionary of miner-specific logs, keyed by miner name.
+- `rules_df: pd.DataFrame`  
+  Rule provenance dataframe showing unique rule counts per miner.
+
+### ⚠️ Design Notes / Gotchas
+- Input dataframe must be fully cleaned — no missing values or unexpected dtypes.
+- Unrecognized miner names will raise a `ValueError`.
+- If no miners are selected, the result will be an empty dataframe.
+- Deduplication of multivariate rules happens after all miners run.
+- Univariate and multivariate statistics are combined if both are run.
+- The `cfg` object is assumed to be compatible with `generate_statistics` and `mine_univar` — it is not validated inside this function.
+- `rules_df` includes a row for univariate rules if present.
+
+### 🔗 Related Functions
+- `mine_univar` — runs univariate statistics.
+- `mine_multivar` — combines, deduplicates, and scores rules.
+- `mine_apriori`, `mine_rulefit`, `mine_cart`, etc. — individual miners called internally.
+- `generate_statistics`, `generate_rule_activation_dataframe` — part of the stats pipeline.
+
+### 🧪 Testing Status
+- ✅ Covered by unit tests using `pytest`
+- Tests include:
+  - No miners
+  - Only univariate
+  - Only multivariate
+  - Mixed miner combinations
+  - Invalid miner names
+- All outputs are validated for structure and content

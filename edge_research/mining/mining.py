@@ -812,3 +812,139 @@ def generate_rule_activation_dataframe(
     mapping_df = pd.DataFrame(rule_descriptions)
 
     return rule_df, mapping_df
+
+### --- Thin wrappers --- ###
+def mine_apriori(df, target_col, apriori_min_support, apriori_metric, apriori_min_metric):
+    """
+    Thin wrapper that runs Apriori + parses the rules. Used by the miner dispatcher.
+    """
+
+    apriori_rules, apriori_log = perform_apriori(df, target_col, apriori_min_support, apriori_metric, apriori_min_metric)
+    apriori_parsed = parse_apriori_rules(apriori_rules)
+    return apriori_parsed, apriori_log
+
+def mine_rulefit(df, target_col, rulefit_tree_size, rulefit_min_depth):
+    """
+    Thin wrapper that runs Rulefit + parses the rules. Used by the miner dispatcher.
+    """
+
+    rulefit_rules, rulefit_log = perform_rulefit(df, target_col, rulefit_tree_size, rulefit_min_depth)
+    rulefit_parsed = parse_rulefit_rules(rulefit_rules)
+    return rulefit_parsed, rulefit_log
+
+def mine_subgroup(df, target_col, subgroup_top_n, subgroup_depth, subgroup_beam_width):
+    """
+    Thin wrapper that runs Subgroup Discovery + parses the rules. Used by the miner dispatcher.
+    """
+
+    subgroup_rules, subgroup_log = perform_subgroup_discovery(df, target_col, subgroup_top_n, subgroup_depth, subgroup_beam_width)
+    subgroup_parsed = parse_subgroup_rules(subgroup_rules)
+    return subgroup_parsed, subgroup_log
+
+def mine_stats(
+    df: pd.DataFrame,
+    target_col: str,
+    miners: List[str],
+    cfg,
+    apriori_min_support: float = 0.01,
+    apriori_metric: str = "lift",
+    apriori_min_metric: float = 0.0,
+    rulefit_tree_size: int = 3,
+    rulefit_min_depth: int = 2,
+    subgroup_top_n: int = 50,
+    subgroup_depth: int = 3,
+    subgroup_beam_width: int = 50,
+) -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame], pd.DataFrame]:
+    """
+    Executes selected rule miners and returns combined statistics, logs, and rule provenance.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Preprocessed input dataframe.
+    target_col : str
+        Name of the target column used by all miners.
+    miners : List[str]
+        List of miner names to run. Supported: 'univar', 'apriori', 'rulefit', 'subgroup', 'elcs', 'cn2', 'cart'.
+    cfg : Any
+        Configuration object to be passed to statistics calculator and univariate miner.
+    apriori_min_support : float, default=0.01
+        Minimum support for Apriori rule mining.
+    apriori_metric : str, default="lift"
+        Metric used by Apriori for rule evaluation.
+    apriori_min_metric : float, default=0.0
+        Minimum threshold for Apriori metric.
+    rulefit_tree_size : int, default=3
+        Tree depth for RuleFit.
+    rulefit_min_depth : int, default=2
+        Minimum rule depth to include from RuleFit.
+    subgroup_top_n : int, default=50
+        Number of top subgroups to return from Subgroup Discovery.
+    subgroup_depth : int, default=3
+        Maximum rule depth for Subgroup Discovery.
+    subgroup_beam_width : int, default=50
+        Beam width for Subgroup Discovery.
+
+    Returns
+    -------
+    final_stats_df : pd.DataFrame
+        Combined dataframe of rule statistics.
+    logs : Dict[str, pd.DataFrame]
+        Dictionary of miner logs keyed by miner name.
+    rules_df : pd.DataFrame
+        Provenance dataframe indicating rule origin per algorithm.
+    """
+
+    MINER_FUNCS = {
+        "apriori": mine_apriori,
+        "rulefit": mine_rulefit,
+        "subgroup": mine_subgroup,
+    }
+
+    MINER_ARGS = {
+        "apriori": [df, target_col, apriori_min_support, apriori_metric, apriori_min_metric],
+        "rulefit": [df, target_col, rulefit_tree_size, rulefit_min_depth],
+        "subgroup": [df, target_col, subgroup_top_n, subgroup_depth, subgroup_beam_width],
+    }
+
+    unknown = set(miners) - set(MINER_FUNCS) - {"univar"}
+    if unknown:
+        raise ValueError(f"Unrecognized miners: {unknown}")
+
+    stats: List[pd.DataFrame] = []
+    rule_sources = []
+    logs: Dict[str, pd.DataFrame] = {}
+    rules_df = pd.DataFrame()
+
+    for name in miners:
+        if name == "univar":
+            stats_df, log = mine_univar(df, cfg)
+            stats.append(stats_df)
+            logs[name] = log
+        else:
+            parsed_rules, log = MINER_FUNCS[name](*MINER_ARGS[name])
+            rule_sources.append((name, parsed_rules))
+            logs[name] = log
+
+    if rule_sources:
+        multivar_stats, multivar_log, rules_df = mine_multivar(df, cfg, rule_sources, target_col)
+        stats.append(multivar_stats)
+        logs["multivar"] = multivar_log
+
+    if not stats:
+        final_stats_df = pd.DataFrame()
+    elif len(stats) == 1:
+        final_stats_df = stats[0]
+    else:
+        final_stats_df = pd.concat(stats, ignore_index=True)
+
+    # If univariate rules were found, add a row to rules_df for provenance tracking
+    if "univar" in miners and not final_stats_df.empty:
+        univar_count = final_stats_df[final_stats_df['rule_depth'] == 1]['antecedents'].nunique()
+        if univar_count > 0:
+            rules_df = pd.concat([
+                rules_df,
+                pd.DataFrame([{"algorithm": "univar", "unique_rule_count": univar_count}])
+            ], ignore_index=True)
+
+    return final_stats_df, logs, rules_df
