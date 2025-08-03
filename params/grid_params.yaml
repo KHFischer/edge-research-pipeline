@@ -1,0 +1,20 @@
+base_run_name: "param_grid"                                 # When using grid, folder will be called {base_run_name}_i
+res_save_path: "data/results/param_grid_1"                  # Path to save results to
+
+to_train_test: True                                         # To run train / test validation
+to_wfa: True                                                # To run Walk Forward validation
+to_bootstrap: True                                          # To run Bootstrap validation
+to_null_fdr: True                                           # To run Null+FDR validation
+
+default_params: "params/default_params.yaml"                # Location of default params 
+custom_params: "params/custom_params.yaml"                  # Location of custom params - order of precedence: param_space - custom - default
+feature_path: "./data/fundamentals_sample.parquet"          # Location of feature dataframe - supports .parquet or .csv and detects automatically
+hloc_path: "./data/hloc_sample.parquet"                     # Location of price dataframe - supports same as features
+res_filetype: "csv"                                         # Filetype to save results to - supports "csv" or "parquet"
+verbose: True                                               # To print updates to console - only works n_jobs=1
+
+n_jobs: 1                                                   # Number of parallel jobs - supports any int >= 1
+
+param_space: {                                              # Grid of parameters to test - key must be one of default_params - value must be valid dtype
+    "target_n_dt": [60, 120],                               # Check docs/params.md for full list of valid params, dtypes and accepted values 
+}

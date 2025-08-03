@@ -1,69 +1,133 @@
-# Edge Research Pipeline
+# 🧠 Edge Research Pipeline
 
-> ⚠️ Work in progress — APIs and modules are still evolving.
-
-The **Edge Research Pipeline** is a modular, privacy-first research toolkit for discovering, validating, and analyzing patterns in tabular datasets. Originally built for **quantitative finance**, the pipeline’s techniques are generalizable to any domain that involves structured data and statistical rule discovery.
+The **Edge Research Pipeline** is a modular, privacy-first research toolkit designed for discovering, validating, and analyzing patterns in tabular datasets. Originally built for **quantitative finance**, its techniques are broadly applicable to any domain involving structured data and statistical rule discovery.
 
 ---
 
-## 🚀 What This Is
+## 🚀 Key Features
 
-A flexible Python library that lets you:
+A flexible, modular Python library enabling you to:
 
-- Clean, normalize, and transform tabular data
-- Engineer features with financial/statistical relevance
-- Generate and label custom targets
-- Discover signal candidates using rule mining and pattern search
-- Run robust statistical validation tests (train/test, bootstrap, walk-forward, etc.)
-- Analyze rule quality and persistence via built-in dashboards
-- Reproduce results via full config export and local-only processing
+* **Clean, normalize, and transform** tabular datasets
+* **Engineer features** relevant to finance, statistics, and other structured-data domains
+* **Generate and label custom targets** for supervised tasks
+* **Discover signals** using rule mining and pattern search methods
+* **Perform robust validation tests** (e.g., train/test splits, bootstrap, walk-forward analysis, false discovery rate)
+* **Reproduce results** with complete configuration export and local-only processing
+* **Efficiently execute parameter grids** via function calls or a CLI
 
 ---
 
 ## 🔒 Privacy by Design
 
-All computations run **locally** — no data is ever uploaded or logged externally. Designed for regulated environments, confidential research, and reproducibility.
+All computations run **locally**—no data ever leaves your environment. Designed explicitly for regulated industries, confidential research, and reproducible workflows.
 
 ---
 
-## 📦 Current Status
+## 📦 Installation
 
-This repo is under **active development**. The API, structure, and features will change as we clean and extract functionality from our internal notebooks.
-
-If you're interested in:
-- Contributing to the open-source foundation
-- Collaborating on use cases in finance, research, or education
-- Early access to advanced features (e.g., automation, dashboard exports, academic support)
-
-👉 [Open an issue](https://github.com/khfischer/edge-research-pipeline/issues) or [start a discussion](https://github.com/khfischer/edge-research-pipeline/discussions)
-
----
-
-## 🔧 Installation (Dev)
-
-Clone the repo and install in editable mode:
+Install required dependencies using:
 
 ```bash
-git clone https://github.com/yourusername/edge-research-pipeline.git
-cd edge-research-pipeline
-pip install -e .
-````
+pip install -r ./requirements.txt
+```
+
+**Note:** Dependencies were generated via `pipreqs` and may need further validation.
+
 ---
 
-## 🔍 Use Cases
+## 🧩 Quick Start Example
 
-While initially focused on quantitative finance workflows — such as factor research, rule mining, and robustness testing — the pipeline can be applied to:
+Run a full pipeline example via the command line:
 
-* Epidemiological pattern discovery
-* Customer segmentation and scoring
-* Educational research and reproducibility
-* Industrial process optimization
+```bash
+python edge_research/pipeline/main.py params/grid_params.yaml
+```
 
-If you can structure your data, you can mine edges.
+Or check the ready-to-run examples in the [`examples/`](./examples/) directory.
+
+---
+
+## 📁 Project Structure
+
+```text
+edge-research-pipeline
+├── data/                  # Sample datasets (sandbox only)
+├── docs/                  # Documentation per module
+├── edge_research/         # Core logic modules
+│   ├── logger/
+│   ├── pipeline/
+│   ├── preprocessing/
+│   ├── rules_mining/
+│   ├── statistics/
+│   ├── utils/
+│   └── validation_tests/
+├── examples/              # Copy-pasteable usage examples
+├── params/                # Configuration files
+├── tests/                 # Unit tests for major functions
+├── LICENSE
+├── README.md
+└── requirements.txt
+```
+
+Detailed explanations for each subfolder are available within their respective READMEs.
+
+---
+
+## ⚙️ Configuration Philosophy
+
+Configuration files are managed via YAML files within `./params/`:
+
+* **`default_params.yaml`**: Base configuration with mandatory default values (do not modify)
+* **`custom_params.yaml`**: Override specific parameters from defaults
+* **`grid_params.yaml`**: Parameters specifically for orchestrating grid pipeline runs
+
+**Precedence hierarchy:**
+
+* For pipeline runs (`pipeline.py` or CLI):
+  `grid_params > custom_params > default_params`
+* For direct function calls:
+  `custom_params > default_params`
+
+Parameters can also be directly overridden by passing a Python dictionary at runtime.
+
+---
+
+## 🧪 Testing
+
+Unit tests cover all major logical functions, ensuring correctness and robustness. Tests are written using `pytest`. Short utility functions, simple wrappers, and internal helpers are generally not included.
+
+Run tests via:
+
+```bash
+pytest tests/
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Follow these guidelines:
+
+* Keep your commits focused and atomic
+* Always provide clear, descriptive commit messages
+* Add or update tests for any new feature or bug fix
+* Follow existing code style (e.g., use `black` and `flake8` for Python formatting)
+* Document new functionality thoroughly within the relevant `.md` file in `docs/`
+* Respect privacy-by-design principles—no logging or external data exposure
+
+Feel free to open issues for discussions or submit pull requests directly.
 
 ---
 
 ## 📄 License
 
-Open source core released under the **MIT License**.
-Some features will be offered as part of a premium or academic version.
+This project is licensed under the **Edge Research Personal Use License (ERPUL)**.
+
+- ✅ Free for personal, student, and academic use (with citation)
+- 💼 Commercial use requires approval (temporarily waived)
+- 🔒 No redistribution without permission
+
+See [`LICENSE`](./LICENSE) for full terms.
+
+![License: ERPUL](https://img.shields.io/badge/license-ERPUL-blue)

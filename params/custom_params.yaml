@@ -1,0 +1,8 @@
+drop_cols: ['location']
+
+to_engineer_ratios: False
+to_engineer_lags: True
+lag_mode: "combined_only"              # Accepts "raw_only", "combined_only", "encoded_and_combined", "raw_and_combined"
+
+n_bootstrap: 100
+n_null: 100

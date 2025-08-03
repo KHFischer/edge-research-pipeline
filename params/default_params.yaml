@@ -1,0 +1,201 @@
+# Setup
+run_name: 'my_first_test'                     # Identifier for run in case running multiple
+id_cols: ['ticker']                           # What column(s) combined signify a unique instrument
+date_col: 'date'                              # One datetime column required
+log_markdown: True                            # Logger supports markdown and/or json
+log_json: True
+log_max_rows: 20                              # Logger uses dataframes - limit row number to prevent writing too many rows
+drop_cols: []                                 # In case there are cols to be used for cleaning, feature engineering, or target creation but not for rule mining
+                                              ## These cols will be used in all steps but dropped before rule discovery - not passing any is acceptable
+
+# Missingnes
+to_drop_high_missingness: True                # Drop columns with too many values missing or not
+missingness_row_thresh: .9                    # At what % of missing rows is the row dropped entirely 
+missingness_col_thresh: .9                    # At what % of missing cols is the row dropped entirely
+
+# Imputation
+to_impute_numeric: True                       # Impute missing values or not
+impute_strategy: 'median'                     # Accepts 'median' or 'mean'
+to_impute_categorical: True                   # To impute categorical values or not
+to_mask_high_impute: True                     # Drop features with imputation > max_imputed
+max_imputed: .5                               # Maximum acceptable % of imputed values - else mask to NaN
+
+# Winsorization
+to_winsorize: False                           # Winsorize or not
+winsor_cols: 'all'                            # Winsorize specific columns or 'all' for all inferred as numeric
+winsor_grouping: 'datetime'                   # Accepts "none", "ids", "datetime", "datetime+ids"
+winsor_dt_units: 60                           # Number of datetime units to group by for winsorization
+winsor_lower_quantile: 0.01                   # Lower winsorization quantile.
+winsor_upper_quantile: 0.99                   # Upper winsorization quantile.
+
+# Scaling
+scaling_method: 'zscore'                      # Accepts one of 'zscore', 'robust', 'quantile_rank', 'unit_vector'
+scale_cols: 'all'                             # Scale specific columns or 'all' for all inferred as numeric
+scale_grouping: 'none'                        # Accepts "none", "ids", "datetime"
+scale_dt_units: 20                            # Number of datetime units to group by for scaling
+robust_scale_quantile_range: [25, 75]         # Quantile range for scaling, e.g. [25, 75] for IQR
+quantile_rank_mode: 'quantile_normal'         # Accepts "rank", "quantile_uniform", "quantile_normal"
+vector_scale_norm_type: 'l2'                  # Norm type: "l2", "l1", "max"
+
+# Variance check
+to_drop_var: True                             # Drop columns with low variance
+variance_threshold: 0.00001                   # Variance threshold below which columns are dropped
+
+# Correlation check
+to_drop_corr: True                            # Drop columns with high correlation
+correlation_threshold: .9                     # Absolute correlation threshold above which columns are dropped
+
+# Feature Engineering
+engineer_cols: 'base'                         # Either 'base' to restrict to numeric columns, or 'all' to process all columns.
+to_engineer_ratios: True                      # Generate all unique pairwise ratio features between specified numeric columns.
+to_engineer_dates: False                      # Extract calendar-based datetime features from a specified date column.
+to_engineer_lags: True                        # Generate temporal percent change features over n_dt rows for specified numeric columns.
+
+# Lags -- Generate temporal percent change features over n_dt rows for specified numeric columns. if to_engineer_lags == True
+lag_mode: "encoded_and_combined"              # Accepts "raw_only", "combined_only", "encoded_and_combined", "raw_and_combined"
+n_dt_list: [4, 2, 1]                          # List of lag intervals (only first element used if lag_mode == "raw_only").
+flat_threshold: [-0.01, 0.01]                 # Threshold range to classify flat trends for lag encoding.
+lag_num_missing: 0                            # Number of acceptable 'no_data' tokens in pattern columns before dropping.
+
+# Binning -- df needs to be one hot encoded so numericals have to be binned first. 
+bin_cols: 'all'                               # Columns to bin, or "all" to auto-select.
+bin_quantiles: [0, 0.25, 0.5, 0.75, 1.0]      # Quantile thresholds for binning (e.g., [0, 0.25, 0.5, 0.75, 1.0]).
+bin_quantile_labels: []                       # Optional custom labels for binned categories.
+bin_grouping: "none"                          # Accepts "none", "ids", "datetime", "datetime+ids"
+bin_dt_units: 4                               # Time units for binning, if applicable.
+to_sweep: True                                # Whether to sweep low-count bins into a reserved label.
+to_drop_no_data: True                         # Whether to drop no_data pattern columns after encoding.
+min_bin_obs: 10                               # Minimum count threshold for bin sweeping.
+min_bin_fraction: 0.01                        # Minimum fraction threshold for bin sweeping.
+
+# Target calculation -- Calculate target column from HLOC dataframe (if to_calculate_target=True)
+to_calculate_target: True                     # Compute forward returns
+target_periods: 20                            # Number of periods to look forward (i.e. N days, N months, depending on granularity of date_col)
+price_col: 'adj_close'                        # Name of the price column to base returns on.
+return_mode: 'pct_change'                     # Return calculation mode. Accepts "pct_change", "log_return", "vol_adjusted", "smoothed"
+vol_window: 20                                # Window (in periods) for realized volatility calculation (used in 'vol_adjusted' mode)
+smoothing_method: 'median'                    # Accepts 'median', 'mean', 'max', 'min'
+target_col: 'forward_return'                  # Output column name for the computed return.
+
+# Target binning -- Bin a target column using quantile, custom threshold, or binary encoding.
+target_binning_method: 'custom'               # Supports "quantile", "custom", "binary"
+target_bins: [-.inf, -0.05, 0.05, .inf]       # For 'quantile': quantile cutoffs (0–1). For 'custom': numeric thresholds. For 'binary': single threshold
+target_labels: ["down", "sideways", "up"]     # Labels for bins or binary encoding.
+target_grouping: "datetime"                   # Accepts 'none', 'ids', 'datetime', 'datetime+ids'
+target_n_dt: 20                               # Number of rows per time window (datetime grouping).
+target_nan_placeholder: "no_data"             # Value to assign to NaNs.
+
+# Statistics Mask -- Apply dynamic filtering rules to rule metrics and annotate selection status.
+stat_min_support: .01                         # Fraction of total transactions containing the rule
+stat_min_observations: 20                     # Absolute count of transactions matching the rule
+stat_bounds_lift: [0.9, 1.1]                  # Lift measures association strength vs. independence
+stat_min_antecedent_support: -1               # Support for the rule’s antecedent (if filtered)
+stat_min_consequent_support: -1               # Support for the rule’s consequent (if filtered)
+stat_min_confidence: -1                       # Probability of consequent given antecedent
+stat_min_representativity: -1                 # Representativity of the rule in its segment (coverage)
+stat_min_leverage: -1                         # Difference between observed and expected co-occurrence
+stat_min_conviction: -1                       # Measures implication strength; sensitive to direction
+stat_min_zhangs_metric: -1                    # Normalized score for directional rule interestingness
+stat_min_jaccard: -1                          # Overlap ratio between antecedent and consequent
+stat_min_certainty: -1                        # Confidence scaled by inverse of consequent probability
+stat_min_kulczynski: -1                       # Average of P(A|B) and P(B|A); symmetric association
+
+# Data prep
+to_sample: True                               # Whether to apply stratified sampling
+sample_size: 100_000                          # Maximum number of rows after sampling
+drop_duplicates: False                        # Whether to drop exact duplicate rows
+
+# Synthetic data
+synth_silence: True                           # If True, suppress stdout, stderr, warnings, and logging during generation.
+corrupt_data: False                           # Apply data corruption or not
+corrupt_target: "none"                        # Apply optional data augmentation techniques to a dataset. one of: "none", "real", "synthetic", "both"
+
+# SDV
+to_sdv: False                                 # If True, generate data using the selected SDV model.
+sdv_rows: 500                                 # Number of synthetic samples to generate using SDV.
+sdv_model: 'gaussian_copula'                  # Synthcity plugin to use. Options: 'gaussian_copula', 'ctgan', 'tvae'
+sdv_verbose: False                            # Whether to print SDV quality score.
+
+# Synthcity
+to_synthcity: False                           # If True, generate data using the selected Synthcity model.
+sc_rows: 500                                  # Number of synthetic samples to generate using Synthcity.
+sc_model: "ctgan"                             # Accepts synthcity plugins such as: "ctgan", "tvae", "adsgan", "pategan", "rtvae"
+sc_n_iter: 10                                 # Number of training iterations for the Synthcity plugin.
+sc_batch_size: 128                            # Mini-batch size during training.
+sc_lr: 0.0001                                 # Learning rate for the Synthcity generator.
+sc_device: "cpu"                              # Device to use for Synthcity ('cpu' or 'cuda').
+
+# Data Augmentation
+to_aug_imbalance: False                       # Whether to apply class imbalance resampling using predefined or auto-generated proportions.
+to_aug_flip_feats: False                      # Whether to randomly flip values in boolean feature columns.
+to_aug_flip_targets: False                    # Whether to randomly flip class labels in the target column.
+flip_feats_frac: 0.1                          # Fraction of boolean feature values to flip (if enabled). Must be between 0.0 and 1.0.
+flip_targs_frac: 0.1                          # Fraction of target labels to flip (if enabled). Must be between 0.0 and 1.0.
+
+# Miners
+miners: ["univar", "rulefit", "subgroup"]     # List of mininig algorithms to run Valid: "apriori", "rulefit", "subgroup", "elcs", "cn2", "cart"
+
+# Apriori
+apriori_min_support: 0.01                     # Minimum support for Apriori rule mining.
+apriori_metric: "lift"                        # Metric used by Apriori for rule evaluation.
+apriori_min_metric: 0.00                      # Minimum threshold for Apriori metric.
+
+# Rulefit
+rulefit_tree_size: 3                          # Tree depth for RuleFit.
+rulefit_min_depth: 2                          # Minimum rule depth to include from RuleFit.
+
+# Subgroup
+subgroup_top_n: 50                            # Number of top subgroups to return from Subgroup Discovery.
+subgroup_depth: 3                             # Maximum rule depth for Subgroup Discovery.
+subgroup_beam_width: 50                       # Beam width for Subgroup Discovery.
+
+# CART
+cart_max_depth: 5                             # Maximum depth of CART decision tree.
+cart_criterion: "gini"                        # CART splitting criterion. Accepts "gini", "entropy"
+cart_random_state: 42                         # Random seed for CART.    
+cart_min_samples_split: 2                     # Minimum samples required to split a node in CART.
+cart_min_samples_leaf: 1                      # Minimum samples required at a leaf node in CART.
+
+# Train Test
+perform_train_test: True                       # Perform a test on a train and test data split
+train_test_split_method: "fractional"          # Splitting strategy. 'temporal' uses fixed date windows, 'fractional' uses fractions of time span.
+train_test_splits: 2                           # Number of train/test splits to create.
+train_test_ranges: [["2010-01-01", "2015-01-01"], ["2015-01-01", "2020-01-01"]] # Optional manual overrides for start/end of each split. List of lists, list of tuples, or none
+train_test_window_frac: 0.6                    # Fraction of data used per training window.
+train_test_step_frac: 0.0                      # Step size as a fraction of total data when moving to the next window.
+train_test_fractions: [0.6, 0.4]               # Relative sizes for train/test allocation within each split.
+train_test_overlap: False                      # Whether train/test windows can overlap chronologically.
+train_test_re_mine: False                      # If True, re-mine rules on each split; if False, mine once and test forward.
+
+# WFA
+perform_wfa: True                              # Perform Walk Forward Analysis over multiple data splits
+wfa_split_method: "temporal"                   # Splitting strategy. 'temporal' uses fixed date windows, 'fractional' uses fractions of time span.
+wfa_splits: 4                                  # Number of WFA windows/splits to generate.
+wfa_ranges: [["2010-01-01", "2017-01-01"], ["2011-01-01", "2018-01-01"], ["2012-01-01", "2019-01-01"], ["2013-01-01", "2020-01-01"]] # Optional manual overrides for start/end of each split. List of lists, list of tuples, or none
+wfa_window_frac: 0.4                           # Fraction of data used per training window.
+wfa_step_frac: 0.2                             # Step size as a fraction of total data when moving to the next window.
+wfa_fractions: [0.25, 0.25, 0.25, 0.25]        # Relative sizes for train/test allocation within each split.
+wfa_overlap: True                              # Whether train/test windows can overlap chronologically.
+wfa_re_mine: True                              # If True, re-mine rules on each split; if False, mine once and test forward.
+
+# Bootstrap
+perform_bootstrap: True                        # Perform Bootstrap Resampling test
+n_bootstrap: 1000                              # Number of bootstrap iterations to perform
+bootstrap_verbose: True                        # Toggles TQDM bar for bootstrap iterations
+resample_method: 'traditional'                 # Accepts "traditional", "block", "block_ids"
+block_size: 4                                  # Number of rows in date column to bootstrap per iteration
+
+# Null Distribution
+perform_null_fdr: True                         # Perform multiple corrections test compared to null distribution
+                                               ## Null is required for FDR so null and FDR are either both or neither
+shuffle_mode: 'target'                         # Type of shuffle: accepts 'target', 'rows', or 'columns'
+n_null: 1000                                   # Maximum number of permutations to perform
+null_verbose: True                             # Toggles TQDM bar for null test permutations
+early_stop_metric: 'lift'                      # Metric that is tested for early stopping relative error calculations
+es_m_permutations: 50                          # Trailing number of permutations to test rel_error over
+rel_error_threshold: 0.01                      # Threshold that stops null distribution generations early if reached
+
+# Multiple Corrections
+correction_metric: 'fdr_bh'                    # Accepts 'fdr_bh', 'fdr_by'
+correction_alpha: .05                          # P value alpha threshold
+fdr_mode: "two-sided"                          # Accepts "greater", "less", "two-sided"
