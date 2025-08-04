@@ -25,6 +25,7 @@ from edge_research.validation_tests.validation import (
     validate_multiple_tests,
     fdr_pipeline
 )
+import edge_research
 from edge_research.rules_mining.mining import data_prep_pipeline
 from edge_research.utils.utils import load_samples
 from edge_research.logger.logger import PipelineLogger

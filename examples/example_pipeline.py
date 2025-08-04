@@ -4,6 +4,7 @@
 # using inline or YAML-based settings, or for a parameter grid defined in a YAML file.
 
 # === 1. Imports ===
+import edge_research
 from edge_research.pipeline.pipeline import edge_research_pipeline, grid_edge_research_pipeline
 from pathlib import Path
 

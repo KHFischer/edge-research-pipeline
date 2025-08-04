@@ -5,21 +5,21 @@ import warnings
 import re
 from statsmodels.stats.multitest import multipletests
 
-from scripts.rules_mining.mining import (
+from edge_research.rules_mining.mining import (
     validate_parsed_rules, 
     generate_rule_activation_dataframe, 
     normalize_and_dedup_rules,
     compute_rule_depth, 
     merge_multivar_map_into_stats
 )
-from scripts.preprocessing.cleaning import clean_pipeline
-from scripts.preprocessing.engineering import engineer_pipeline
-from scripts.preprocessing.target import target_pipeline
-from scripts.rules_mining.mining import (
+from edge_research.preprocessing.cleaning import clean_pipeline
+from edge_research.preprocessing.engineering import engineer_pipeline
+from edge_research.preprocessing.target import target_pipeline
+from edge_research.rules_mining.mining import (
     data_prep_pipeline, 
     mining_pipeline
 )
-from scripts.statistics.calculator import generate_statistics
+from edge_research.statistics.calculator import generate_statistics
 
 # --- Train test / WFA --- #
 def parse_date_ranges(date_ranges):

@@ -25,7 +25,7 @@ from edge_research.rules_mining.mining import (
 import edge_research
 from edge_research.utils.utils import load_samples
 from edge_research.logger.logger import PipelineLogger
-from edge_researchparams.config_validator import load_params, Config
+from edge_research.params.config_validator import load_params, Config
 from edge_research.preprocessing.cleaning import clean_pipeline
 from edge_research.preprocessing.engineering import engineer_pipeline
 from edge_research.preprocessing.target import target_pipeline
@@ -86,7 +86,7 @@ print("Prepared real_df shape:", real_df.shape)
 synth_df, synth_logs = generate_combined_synthetic_data(
     df=real_df,
     target_col=cfg.target_col,
-    to_sdv=cfg.to_sdv,
+    to_sdv=cfg.to_sdv, # If sdv and synthcity are disabled (default) this will fail. Edit cfg or set either to True to test this call
     to_synthcity=cfg.to_synthcity,
     sdv_model=cfg.sdv_model,
     sdv_rows=cfg.sdv_rows,

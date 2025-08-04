@@ -90,7 +90,7 @@ print("Columns after minimal encoding:", df.columns.tolist())
 
 # Full config-driven example
 df, encode_data_logs = encode_data(
-    df=df,
+    df=df_cleaned,
     id_cols=cfg.id_cols,
     date_col=cfg.date_col,
     drop_cols=cfg.drop_cols,
