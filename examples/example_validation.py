@@ -28,7 +28,7 @@ from edge_research.validation_tests.validation import (
 from edge_research.rules_mining.mining import data_prep_pipeline
 from edge_research.utils.utils import load_samples
 from edge_research.logger.logger import PipelineLogger
-from params.config_validator import load_params, Config
+from edge_research.params.config_validator import load_params, Config
 from edge_research.preprocessing.cleaning import clean_pipeline
 from edge_research.preprocessing.engineering import engineer_pipeline
 from edge_research.preprocessing.target import target_pipeline
@@ -36,7 +36,14 @@ from edge_research.preprocessing.target import target_pipeline
 # --- SETUP ---
 
 hloc_df, feature_df = load_samples()
-params = load_params("params/default_params.yaml", "params/custom_params.yaml")
+
+params_dir = Path(edge_research.__path__[0]) / "params"
+
+# Load configuration files
+default_params = params_dir / "default_params.yaml"
+custom_params = params_dir / "custom_params.yaml"
+
+params = load_params(str(default_params), str(custom_params))
 cfg = Config(**params)
 
 run_name = cfg.run_name

@@ -56,7 +56,7 @@ logger.log_step(
     max_rows=log_max_rows
 )
 
-print(f"Logged 'Example Step' to {logger.log_path}")
+print(f"Logged 'Example Step' to {save_folder / f"{run_name}_log"}")
 
 # --- 5. Manual Param Override Example (Optional) ---
 

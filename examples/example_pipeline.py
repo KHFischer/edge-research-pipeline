@@ -5,6 +5,16 @@
 
 # === 1. Imports ===
 from edge_research.pipeline.pipeline import edge_research_pipeline, grid_edge_research_pipeline
+from pathlib import Path
+
+# Resolve params directory inside installed package
+params_dir = Path(edge_research.__path__[0]) / "params"
+data_path = Path(edge_research.__path__[0]) / "data"
+
+# Load configuration files
+default_params = params_dir / "default_params.yaml"
+custom_params = params_dir / "custom_params.yaml"
+grid_params = params_dir / "grid_params.yaml"
 
 # === 2. Single-Run Pipeline with Custom Parameters (inline dict) ===
 results, logs = edge_research_pipeline(
@@ -12,17 +22,17 @@ results, logs = edge_research_pipeline(
     to_wfa=True,
     to_bootstrap=True,
     to_null_fdr=True,
-    default_params="params/default_params.yaml",
+    default_params=str(default_params),
     custom_params={"target_n_dt": 60},  # Can also be a path to YAML
-    feature_path="data/fundamentals_sample.parquet",
-    hloc_path="data/hloc_sample.parquet",
+    feature_path=data_path/"fundamentals_sample.parquet",
+    hloc_path=data_path/"data/hloc_sample.parquet",
     res_save_path="data/results/",
     res_filetype="csv",
     verbose=True,
 )
 
 # === 3. Grid-Based Pipeline Run (YAML config with param_space and n_jobs) ===
-results_list = grid_edge_research_pipeline("params/grid_params.yaml")
+results_list = grid_edge_research_pipeline(str(grid_params))
 
 # === 4. CLI Equivalent ===
 # python edge_research_notebook/scripts/pipeline/main.py params/grid_params.yaml

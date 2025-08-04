@@ -1,7 +1,7 @@
 import os
 import sys
 
-# Get the directory two levels up from this script (i.e., edge_research_notebook/)
+# Get the directory two levels up from this script (i.e., edge_research/)
 THIS_FILE = os.path.abspath(__file__)
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(THIS_FILE)))
 sys.path.insert(0, SRC_ROOT)
@@ -15,15 +15,15 @@ import yaml
 from tqdm.auto import tqdm
 from joblib import Parallel, delayed
 from itertools import product
+import warnings
+import contextlib
+import io
 
 """
 Some libraries print long warnings that are unrelated to the edge research pipeline.
 Set SUPPRESS to False if you wish to see them.
 Else they are suppressed. 
 """
-import warnings
-import contextlib
-import io
 @contextlib.contextmanager
 def suppress_import_warnings():
     # Suppress Python warnings
@@ -39,13 +39,13 @@ SUPPRESS = True
 if SUPPRESS:
     with suppress_import_warnings():
         os.environ["KEOPS_VERBOSE"] = "0"
-        from params.config_validator import load_params, Config
-        from scripts.logger.logger import PipelineLogger
-        from scripts.preprocessing.cleaning import clean_pipeline
-        from scripts.preprocessing.engineering import engineer_pipeline
-        from scripts.preprocessing.target import target_pipeline
-        from scripts.rules_mining.mining import data_prep_pipeline, mining_pipeline
-        from scripts.validation_tests.validation import train_test_pipeline, wfa_pipeline, bootstrap_pipeline, null_pipeline, fdr_pipeline
+        from edge_research.params.config_validator import load_params, Config
+        from edge_research.logger.logger import PipelineLogger
+        from edge_research.preprocessing.cleaning import clean_pipeline
+        from edge_research.preprocessing.engineering import engineer_pipeline
+        from edge_research.preprocessing.target import target_pipeline
+        from edge_research.rules_mining.mining import data_prep_pipeline, mining_pipeline
+        from edge_research.validation_tests.validation import train_test_pipeline, wfa_pipeline, bootstrap_pipeline, null_pipeline, fdr_pipeline
 
 def load_table(path: Union[str, Path]) -> pd.DataFrame:
     """

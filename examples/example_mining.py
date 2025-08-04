@@ -22,9 +22,10 @@ from edge_research.rules_mining.mining import (
     mining_pipeline,
     mine_stats
 )
+import edge_research
 from edge_research.utils.utils import load_samples
 from edge_research.logger.logger import PipelineLogger
-from params.config_validator import load_params, Config
+from edge_researchparams.config_validator import load_params, Config
 from edge_research.preprocessing.cleaning import clean_pipeline
 from edge_research.preprocessing.engineering import engineer_pipeline
 from edge_research.preprocessing.target import target_pipeline
@@ -35,7 +36,13 @@ from edge_research.preprocessing.target import target_pipeline
 hloc_df, feature_df = load_samples()
 
 # Load config (YAML or dict supported)
-params = load_params("params/default_params.yaml", "params/custom_params.yaml")
+params_dir = Path(edge_research.__path__[0]) / "params"
+
+# Load configuration files
+default_params = params_dir / "default_params.yaml"
+custom_params = params_dir / "custom_params.yaml"
+
+params = load_params(str(default_params), str(custom_params))
 cfg = Config(**params)
 
 # Setup results/logging

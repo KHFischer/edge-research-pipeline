@@ -18,7 +18,7 @@ def load_samples() -> Tuple[pd.DataFrame, pd.DataFrame]:
     Assumes data is located in `./data/` relative to project root.
     Used in examples, tests, and notebooks for reproducibility.
     """
-    data_path = Path("./data")
+    data_path = Path(edge_research.__path__[0]) / "data"
     hloc_sample = pd.read_parquet(data_path / "hloc_sample.parquet")
     fundamentals_sample = pd.read_parquet(data_path / "fundamentals_sample.parquet")
     return hloc_sample, fundamentals_sample

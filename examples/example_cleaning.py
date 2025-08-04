@@ -20,17 +20,24 @@ from edge_research.preprocessing.cleaning import (
     normalize_features,
     clean_pipeline
 )
+import edge_research
 from edge_research.utils.utils import load_samples
 from edge_research.logger.logger import PipelineLogger
-from params.config_validator import load_params, Config
+from edge_research.params.config_validator import load_params, Config
 
 # --- SETUP ---
 
 # Load sample feature DataFrame (replace with your own as needed)
 _, feature_df = load_samples()
 
-# Load config (YAML or dict supported)
-params = load_params("params/default_params.yaml", "params/custom_params.yaml")
+# Resolve params directory inside installed package
+params_dir = Path(edge_research.__path__[0]) / "params"
+
+# Load configuration files
+default_params = params_dir / "default_params.yaml"
+custom_params = params_dir / "custom_params.yaml"
+
+params = load_params(str(default_params), str(custom_params))
 cfg = Config(**params)
 
 # Setup results/logging

@@ -24,7 +24,7 @@ from sdv.evaluation.single_table import evaluate_quality
 from numpy.random import default_rng
 from badgers.generators.tabular_data.imbalance import RandomSamplingClassesGenerator
 
-from scripts.statistics.calculator import generate_statistics
+from edge_research.statistics.calculator import generate_statistics
 
 # Orange and Synthcity are incompatible together. Please see README.md for more information
 try:
