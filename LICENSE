@@ -1,6 +1,6 @@
 Edge Research Pipeline — Personal Use License (ERPUL)
 
-Copyright (c) \Kalle Fischer
+Copyright (c) Kalle Fischer
 
 Permission is hereby granted to individuals to use, modify, and explore this software **for personal, non-commercial, and academic learning purposes** free of charge, subject to the following conditions:
 
@@ -15,13 +15,14 @@ Permission is hereby granted to individuals to use, modify, and explore this sof
 
 * Academic researchers may use this software in published work **free of charge**, provided that the publication explicitly refers to this project (via citation, footnote, or GitHub link).
 * If a citation is not included, a license fee **would normally apply**.
-* However, **for now**, all academic license fees are **waived until a formal payment process is in place**.
+* Academic users should contact the author for confirmation or payment details:
+  **Email:** [contact@khf-research.com](mailto:contact@khf-research.com)
 
 ## 3. Commercial and Professional Use
 
 * Use of this software in a commercial setting (including internal research at a for-profit company, paid consulting, or use in a production environment) requires a paid commercial license.
-* **At this time**, no payment system is implemented, so fees are **temporarily waived**.
-* You are still required to contact the author to disclose commercial use and agree to future terms.
+* You are required to contact the author to disclose commercial use and request payment instructions.
+  **Email:** [contact@khf-research.com](mailto:contact@khf-research.com)
 
 ## 4. Redistribution
 
@@ -37,9 +38,9 @@ This software is provided "as is", without warranty of any kind, express or impl
 
 To notify of commercial use or request academic waiver confirmation, please contact:
 
-**\Kalle Fischer**
-**Email:** \[kallefischer@outlook.com](mailto:kallefischer@outlook.com)]
-**Project URL:** \[[https://github.com/KHFischer/edge-research-pipeline](https://github.com/KHFischer/edge-research-pipeline)]
+**Kalle Fischer**  
+**Email:** [contact@khf-research.com](mailto:contact@khf-research.com)  
+**Project URL:** [https://github.com/KHFischer/edge-research-pipeline](https://github.com/KHFischer/edge-research-pipeline)
 
 You may also submit licensing questions or intent to use commercially through the project issue tracker.
 
