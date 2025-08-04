@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "edge-research-pipeline"
-version = "0.1.4"  # to be updated per release
+version = "0.1.5"  # to be updated per release
 description = "Modular pipeline for quantitative signal discovery and validation"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -74,4 +74,4 @@ Issues = "https://github.com/KHFischer/edge-research-pipeline/issues"
 edge-cli = "edge_research.pipeline.main:main"
 
 [tool.setuptools.packages.find]
-where = ["edge_research"]  # This tells setuptools to treat edge_research/ as the package root
+where = ["."]
