@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 from typing import Tuple
+import edge_research
 
 def load_samples() -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
