@@ -1,0 +1,87 @@
+# ========================
+# Python + Packaging
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Byte-compiled and cache
+*.egg
+*.egg-info/
+*.eggs/
+*.manifest
+*.spec
+
+# Build & Distribution
+build/
+dist/
+*.wheel
+*.whl
+*.tar.gz
+*.zip
+pip-wheel-metadata/
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# VS Code / PyCharm / Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter kernel/metadata artifacts
+*.ipynb_checkpoints/
+.ipynb_checkpoints/
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Log and debug
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Testing / Coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+coverage.xml
+.cache/
+pytest_cache/
+nosetests.xml
+test_output/
+
+# Docs
+_site/
+*.html
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# PyPI config
+*.pypirc
+
+# Local data / examples / temp outputs
+*.parquet
+*.csv
+*.feather
+*.h5
+*.xlsx
+
+# Ignore all parquet files by default
+*.parquet
+
+# EXCEPTION: Keep tracked sample data
+!data/hloc_sample.parquet
+!data/fundamentals_sample.parquet
