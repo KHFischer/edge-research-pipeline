@@ -26,7 +26,6 @@ All computations run **locally**—no data ever leaves your environment. Designe
 
 ---
 
-```markdown
 ## 📦 Installation
 
 Install the latest release from **PyPI**:
