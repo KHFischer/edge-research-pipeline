@@ -4,10 +4,9 @@ import yaml
 from collections import ChainMap
 import logging
 from dataclasses import dataclass
-from typing import List, Union
-from params.config_schema import GROUPS
 from typing import Dict, Any, List, Optional, Union, Set
 
+from edge_research.params.config_schema import GROUPS
 
 def pretty_print_params(chainmap, show_layers=False):
     """

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "edge-research-pipeline"
-version = "0.1.5"  # to be updated per release
+version = "0.1.7"  # to be updated per release
 description = "Modular pipeline for quantitative signal discovery and validation"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -72,6 +72,9 @@ Issues = "https://github.com/KHFischer/edge-research-pipeline/issues"
 
 [project.scripts]
 edge-cli = "edge_research.pipeline.main:main"
+
+[tool.setuptools.package-data]
+"edge_research" = ["data/*.parquet", "params/*.yaml"]
 
 [tool.setuptools.packages.find]
 where = ["."]

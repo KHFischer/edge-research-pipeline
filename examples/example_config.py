@@ -9,11 +9,20 @@ Demonstrates loading and using pipeline configuration via:
 See: docs/config.md for all supported parameters and Config dataclass structure.
 """
 
-from params.config_validator import load_params, Config
+import edge_research
+from edge_research.params.config_validator import load_params, Config
+from pathlib import Path
 
 # --- 1. Load Config from YAML Files (Recommended) ---
 
-params = load_params("params/default_params.yaml", "params/custom_params.yaml")
+# Resolve params directory inside installed package
+params_dir = Path(edge_research.__path__[0]) / "params"
+
+# Load configuration files
+default_params = params_dir / "default_params.yaml"
+custom_params = params_dir / "custom_params.yaml"
+
+params = load_params(default_params, custom_params)
 cfg = Config(**params)
 
 print("Run name from config (YAML):", cfg.run_name)  # e.g., 'my_first_test' (default or custom value)
@@ -21,7 +30,7 @@ print("Run name from config (YAML):", cfg.run_name)  # e.g., 'my_first_test' (de
 # --- 2. Load Config with Python Dict Override (Advanced) ---
 
 custom_params_dict = {"run_name": "my_run"}
-params = load_params("params/default_params.yaml", custom_params_dict)
+params = load_params(default_params, custom_params_dict)
 cfg = Config(**params)
 
 print("Run name with dict override:", cfg.run_name)  # 'my_run'
@@ -30,7 +39,7 @@ print("Run name with dict override:", cfg.run_name)  # 'my_run'
 
 # --- 3. Verbose Parameter Logging (For Debugging) ---
 
-params = load_params("params/default_params.yaml", custom_params_dict, verbose=True)
+params = load_params(default_params, custom_params_dict, verbose=True)
 # This prints all parameters and their values for full transparency.
 
 # --- 4. Edit Custom YAML for Persistent Changes ---
