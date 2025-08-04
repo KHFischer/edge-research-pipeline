@@ -1,0 +1,7 @@
+include LICENSE
+include README.md
+include requirements.txt
+recursive-include edge_research *.yaml
+recursive-include edge_research *.parquet
+recursive-include edge_research *.md
+recursive-include edge_research *.txt

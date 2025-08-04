@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edge-research-pipeline"
+version = "0.1.4"  # to be updated per release
+description = "Modular pipeline for quantitative signal discovery and validation"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Kalle Fischer", email = "contact@khf-research.com" }]
+keywords = [
+    "rule mining",
+    "pattern discovery",
+    "interpretable machine learning",
+    "feature engineering",
+    "tabular data",
+    "tabular machine learning",
+    "subgroup discovery",
+    "signal discovery",
+    "data validation",
+    "data cleaning pipeline",
+    "rule-based modeling",
+    "backtesting",
+    "bootstrap resampling",
+    "walk-forward analysis",
+    "synthetic data generation",
+    "quantitative research",
+    "financial machine learning",
+    "quantitative finance",
+    "python package"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",  
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Information Analysis"
+]
+requires-python = ">=3.8"
+
+# 🔧 Copy actual dependencies from requirements.txt here
+dependencies = [
+    "badgers>=0.0.10,<0.1",
+    "google_auth>=2.40.3,<3.0",
+    "imodels>=2.0.0,<3.0",
+    "joblib>=1.4.2,<2.0",
+    "mlxtend>=0.23.4,<0.24",
+    "numpy>=1.26.0,<2.0",  # Compatible with pandas 2.3.1 and Python 3.12+
+    "pandas>=2.3.1,<2.4",
+    "params>=0.9.0,<1.0",
+    "pysubgroup>=0.8.0,<0.9",
+    "PyYAML>=6.0.2,<7.0",
+    "scikit_eLCS>=1.2.4,<1.3",
+    "scikit-learn>=1.7.1,<2.0",  # corrected name from scikit_learn
+    "scipy>=1.16.1,<2.0",        # if using Python 3.12+, ensure >=1.25.2 instead
+    "sdv>=1.24.1,<1.25",
+    "statsmodels>=0.14.4,<0.15",
+    "tqdm>=4.67.1,<5.0",
+]
+
+[project.optional-dependencies]
+orange = ["orange3>=3.39.0,<4.0"]
+synth = ["synthcity>=0.2.12,<0.3"]
+
+[project.urls]
+Homepage = "https://github.com/KHFischer/edge-research-pipeline"
+Documentation = "https://github.com/KHFischer/edge-research-pipeline/tree/main/docs"
+Source = "https://github.com/KHFischer/edge-research-pipeline"
+Issues = "https://github.com/KHFischer/edge-research-pipeline/issues"
+
+[project.scripts]
+edge-cli = "edge_research.pipeline.main:main"
+
+[tool.setuptools.packages.find]
+where = ["edge_research"]  # This tells setuptools to treat edge_research/ as the package root
