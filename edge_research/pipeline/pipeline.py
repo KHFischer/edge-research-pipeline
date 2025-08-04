@@ -3,7 +3,7 @@ import sys
 
 # Get the directory two levels up from this script (i.e., edge_research/)
 THIS_FILE = os.path.abspath(__file__)
-SRC_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(THIS_FILE)))
+SRC_ROOT = os.path.dirname(os.path.dirname(THIS_FILE))  # up to edge_research/
 sys.path.insert(0, SRC_ROOT)
 
 import pandas as pd
