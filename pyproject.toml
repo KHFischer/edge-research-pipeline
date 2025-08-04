@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "edge-research-pipeline"
-version = "0.1.7"  # to be updated per release
+version = "0.1.8"  # to be updated per release
 description = "Modular pipeline for quantitative signal discovery and validation"
 readme = "README.md"
 license = { file = "LICENSE" }
